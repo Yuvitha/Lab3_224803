@@ -1,43 +1,38 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ticket_app/screens/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ticket_app/controller/bottom_nav_controller.dart';
+import 'package:ticket_app/provider/bottom_nav_provider.dart';
+import 'package:ticket_app/screens/home/home_screen.dart';
+import 'package:ticket_app/screens/profile/widgets/profile.dart';
+import 'package:ticket_app/screens/search/widgets/search_screen.dart';
+import 'package:ticket_app/screens/ticket/ticket_screen.dart';
+import 'package:get/get.dart';
 
-class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({Key? key}) : super(key: key);
+class BottomNavBar extends ConsumerWidget {
+  BottomNavBar({Key? key}) : super(key: key);
 
-  @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
-}
+  //list is iterated using index
 
-class _BottomNavBarState extends State<BottomNavBar> {
-  // Screens corresponding to each tab
-  final List<Widget> appScreens = [
+  final appScreens = [
     const HomeScreen(),
-    const Center(child: Text("Search")),
-    const Center(child: Text("Tickets")),
-    const Center(child: Text("Profile")),
+    const SearchScreen(),
+    const TicketScreen(),
+    const ProfileScreen(),
   ];
 
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var selectedIndex = ref.watch(bottomNavBarNotifierProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text("My Tickets")),
-      body: appScreens[_selectedIndex],
+      body: appScreens[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: selectedIndex,
+        onTap: ref.watch(bottomNavBarNotifierProvider.notifier).onItemTapped,
         selectedItemColor: Colors.blueGrey,
         unselectedItemColor: const Color(0xFF526400),
         showSelectedLabels: false,
-        showUnselectedLabels: false,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(FluentSystemIcons.ic_fluent_home_regular),
@@ -46,7 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ),
           BottomNavigationBarItem(
             icon: Icon(FluentSystemIcons.ic_fluent_search_regular),
-            activeIcon: Icon(FluentSystemIcons.ic_fluent_search_filled),
+            activeIcon: Icon(FluentSystemIcons.ic_fluent_search_info_filled),
             label: "Search",
           ),
           BottomNavigationBarItem(
